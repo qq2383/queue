@@ -2,6 +2,57 @@
 
 A Queue for Go package
 
+# API
+```
+func NewQueue() *Queue
+```
+NewQueue return a new queue pointer
+
+```
+func (q *Queue) Back() any
+```
+Back return the value of the first node in the queue
+
+```
+func (q *Queue) Contains(v any) bool
+```
+Check whether there are nodes in the queue whose value is v
+
+```
+func (q *Queue) Each(exec func(node *Node) bool)
+```
+Traverse the queue node, exec is a callback function
+
+```
+func (q *Queue) Font() any
+```
+Font return the value of the last node in the queue
+
+```
+func (q *Queue) Pop() (any, error)
+```
+Retrieve the value of the first node in the queue and remove it
+
+```
+func (q *Queue) Popend() (any, error)
+```
+Retrieve the value of the last node in the queue and remove it
+
+```
+func (q *Queue) Put(v any)
+```
+Join the queue last
+
+```
+func (q *Queue) Remove(v any) (bool, error)
+```
+Delete a node whose queue value is v
+
+```
+func (q *Queue) Size() int
+```
+Returns the queue length
+
 # Example
 ```
 package main

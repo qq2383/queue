@@ -1,6 +1,7 @@
 package queue
 
 import (
+	"errors"
 	"sync"
 )
 
@@ -19,6 +20,111 @@ type Queue struct {
 
 func NewQueue() *Queue {
 	return &Queue{}
+}
+
+func (q *Queue) Back() any {
+	defer q.lock.Unlock()
+
+	q.lock.Lock()
+	if q.last == nil {
+		return nil
+	}
+	return q.last.Value
+}
+
+func (q *Queue) Contains(v any) bool {
+	defer q.lock.Unlock()
+
+	q.lock.Lock()
+	re := false
+	q.Each(func(n *Node) bool {
+		re = n.Value == v
+		return !re
+	})
+	return re
+}
+
+func (q *Queue) Each(exec func(node *Node) bool) {
+	node := q.first
+	for {
+		if !exec(node) {
+			break
+		}
+		if node == nil || node.Next == nil {
+			break
+		}
+		node = node.Next
+	}
+}
+
+func (q *Queue) Font() any {
+	defer q.lock.Unlock()
+
+	q.lock.Lock()
+	if q.first == nil {
+		return nil
+	}
+	return q.first.Value
+}
+
+func (q *Queue) pop(node *Node) error {
+	if node == nil {
+		return errors.New("node not nil")
+	}
+
+	if node == q.first {
+		next := node.Next
+		if next != nil {
+			next.Prev = nil
+		}
+		q.first = next
+	} else {
+		prev := node.Prev
+		if node == q.last {
+			prev.Next = nil
+			q.last = prev
+		} else {
+			prev.Next = node.Next
+		}
+	}
+
+	q.length--
+	return nil
+}
+
+func (q *Queue) Pop() (any, error) {
+	defer q.lock.Unlock()
+
+	q.lock.Lock()
+	node := q.first
+	if node == nil {
+		return nil, errors.New("queue is empty")
+	}
+
+	err := q.pop(node)
+	if err != nil {
+		return nil, err
+	}
+	return q.value(node)
+}
+
+func (q *Queue) Popend() (any, error) {
+	defer q.lock.Unlock()
+
+	q.lock.Lock()
+	node := q.last
+	if node == nil {
+		if q.first == nil {
+			return nil, errors.New("queue is empty")
+		} 
+		node = q.first
+	}
+
+	err := q.pop(node)
+	if err != nil {
+		return nil, err
+	}
+	return q.value(node)
 }
 
 func (q *Queue) Put(v any) {
@@ -43,48 +149,37 @@ func (q *Queue) Put(v any) {
 	q.length++
 }
 
-func (q *Queue) Pop() any {
+func (q *Queue) Remove(v any) (bool, error) {
 	defer q.lock.Unlock()
 
 	q.lock.Lock()
-	node := q.first
-	if node == nil {
-		return nil
+	if q.Size() == 0 || q.first == nil {
+		return false, errors.New("queue is empty")
 	}
-	q.length--
-	next := node.Next
-	if next == nil {
-		q.first = nil
-	} else {
-		next.Prev = nil
-		q.first = next
-		if next == q.last {
-			q.last = nil
+
+	var node *Node
+	q.Each(func(n *Node) bool {
+		if n.Value == v {
+			node = n
+			return false
 		}
+		return true
+	})
+
+	if node == nil {
+		return false, errors.New("not find v in queue")
 	}
-	return node.Value
+
+	err := q.pop(node)
+	return err == nil, err
 }
 
 func (q *Queue) Size() int {
 	return q.length
 }
 
-func (q *Queue) Font() any {
-	defer q.lock.Unlock()
-
-	q.lock.Lock()
-	if q.first == nil {
-		return nil
-	}
-	return q.first.Value
-}
-
-func (q *Queue) Back() any {
-	defer q.lock.Unlock()
-
-	q.lock.Lock()
-	if q.last == nil {
-		return nil
-	}
-	return q.last.Value
+func (q *Queue) value(node *Node) (any, error) {
+	v := node.Value
+	node = nil
+	return v, nil
 }
