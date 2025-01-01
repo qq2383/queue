@@ -1,6 +1,6 @@
 # Overview
 
-A Queue for Go package
+A Queue for Go package, Achieve FIFO LIFO
 
 # API
 ```
@@ -21,7 +21,7 @@ Check whether there are nodes in the queue whose value is v
 ```
 func (q *Queue) Each(exec func(node *Node) bool)
 ```
-Traverse the queue node, exec is a callback function
+Go through all nodes in the queue and pass in the current node to the callback function, and the callback function returns false to exit the loop
 
 ```
 func (q *Queue) Font() any
