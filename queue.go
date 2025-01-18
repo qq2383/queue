@@ -5,12 +5,19 @@ import (
 	"sync"
 )
 
+// Node struct
+// Value is the value of the node,
+// Next points to the next node
 type Node struct {
 	Value any
 	Next  *Node
 	Prev  *Node
 }
 
+// Queue struct
+// first The first node in the queue,
+// last The last node in the queue,
+// length The number of nodes in the queue
 type Queue struct {
 	lock   sync.Mutex
 	first  *Node
@@ -18,10 +25,12 @@ type Queue struct {
 	length int
 }
 
+// Return a new queue pointer
 func NewQueue() *Queue {
 	return &Queue{}
 }
 
+// Returns the value of the last node in the queue
 func (q *Queue) Back() any {
 	defer q.lock.Unlock()
 
@@ -32,6 +41,7 @@ func (q *Queue) Back() any {
 	return q.last.Value
 }
 
+// Check whether there are nodes in the queue whose value is v
 func (q *Queue) Contains(v any) bool {
 	defer q.lock.Unlock()
 
@@ -44,6 +54,8 @@ func (q *Queue) Contains(v any) bool {
 	return re
 }
 
+// Go through all nodes in the queue and pass in the current node to the callback function, 
+// and the callback function returns false to exit the loop
 func (q *Queue) Each(exec func(node *Node) bool) {
 	node := q.first
 	for {
@@ -57,6 +69,7 @@ func (q *Queue) Each(exec func(node *Node) bool) {
 	}
 }
 
+// Return the value of the first node in the queue
 func (q *Queue) Font() any {
 	defer q.lock.Unlock()
 
@@ -67,6 +80,7 @@ func (q *Queue) Font() any {
 	return q.first.Value
 }
 
+// Returns the value of the first or last node in the queue and deletes it
 func (q *Queue) pop(node *Node) error {
 	if node == nil {
 		return errors.New("node not nil")
@@ -92,6 +106,7 @@ func (q *Queue) pop(node *Node) error {
 	return nil
 }
 
+// Return the value of the first node in the queue and remove it
 func (q *Queue) Pop() (any, error) {
 	defer q.lock.Unlock()
 
@@ -108,6 +123,7 @@ func (q *Queue) Pop() (any, error) {
 	return q.value(node)
 }
 
+// Returns the value of the last node in the queue and deletes it
 func (q *Queue) Popend() (any, error) {
 	defer q.lock.Unlock()
 
@@ -116,7 +132,7 @@ func (q *Queue) Popend() (any, error) {
 	if node == nil {
 		if q.first == nil {
 			return nil, errors.New("queue is empty")
-		} 
+		}
 		node = q.first
 	}
 
@@ -127,6 +143,7 @@ func (q *Queue) Popend() (any, error) {
 	return q.value(node)
 }
 
+// Join the queue last
 func (q *Queue) Put(v any) {
 	defer q.lock.Unlock()
 
@@ -149,6 +166,7 @@ func (q *Queue) Put(v any) {
 	q.length++
 }
 
+// Delete a node whose queue value is v
 func (q *Queue) Remove(v any) (bool, error) {
 	defer q.lock.Unlock()
 
@@ -174,10 +192,12 @@ func (q *Queue) Remove(v any) (bool, error) {
 	return err == nil, err
 }
 
+// Returns the queue length
 func (q *Queue) Size() int {
 	return q.length
 }
 
+// Returns the node value
 func (q *Queue) value(node *Node) (any, error) {
 	v := node.Value
 	node = nil

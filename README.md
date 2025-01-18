@@ -11,7 +11,7 @@ NewQueue return a new queue pointer
 ```
 func (q *Queue) Back() any
 ```
-Back return the value of the first node in the queue
+Back return the value of the last node in the queue
 
 ```
 func (q *Queue) Contains(v any) bool
@@ -26,17 +26,17 @@ Go through all nodes in the queue and pass in the current node to the callback f
 ```
 func (q *Queue) Font() any
 ```
-Font return the value of the last node in the queue
+Font return the value of the first node in the queue
 
 ```
 func (q *Queue) Pop() (any, error)
 ```
-Retrieve the value of the first node in the queue and remove it
+Return the value of the first node in the queue and remove it
 
 ```
 func (q *Queue) Popend() (any, error)
 ```
-Retrieve the value of the last node in the queue and remove it
+Returns the value of the last node in the queue and deletes it
 
 ```
 func (q *Queue) Put(v any)
